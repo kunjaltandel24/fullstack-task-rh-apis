@@ -102,3 +102,19 @@ dist
 
 # TernJS port file
 .tern-port
+
+# jetbrains ide folder
+.idea
+
+# database json config
+database.json
+
+# google service account
+ServiceAccount.json
+
+# compiled js and js.map files
+src/**/*.js
+src/**/*.js.map
+
+# uploaded images
+uploads/
