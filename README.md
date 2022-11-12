@@ -3,6 +3,7 @@
 - Clone Both [image-gallery-client](https://github.com/kunjaltandel24/image-gallery-client) and [image-gallery](https://github.com/kunjaltandel24/image-gallery) in single folder and Follow the steps mentioned below.
 
 ## required services
+
 - **Stripe Account**
   - **secret_key** key is required in backend
   - complete the platform profile to enable connected accounts for payout to image owners
@@ -12,6 +13,7 @@
   - **SES_HOST** SMTP host is required to send outgoing mail request.
   - **SES_EMAIL** any email enable in your enabled in your Mail Server of SMTP host.
   - if aws then required **access_key** as user and **secret_access_key** as password to SMTP service
+- **MongoDB** connection string from local/atlas is required
 
 ## Build Setup
 ```bash
