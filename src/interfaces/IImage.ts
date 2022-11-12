@@ -9,5 +9,8 @@ export default interface IImage {
 	isPublic: boolean
 	user: PopulatedDoc<IUser & Document>
 	tags: string[]
+	stripeProductId?: string
+	stripePriceId?: string
 	originalUser?: PopulatedDoc<IUser & Document>
+	isDeleted: boolean
 }

@@ -73,7 +73,7 @@ export default class AuthController extends ApiResponse implements IAuthControll
 
 	async login(req: Request, res: Response): Promise<void> {
 		try {
-			const user = await this.authService.userSignin(req.body)
+			const user = await this.authService.userSignin(req.body, res)
 			return this.sendSuccess(req, res, 'logged in successfully', user)
 		} catch (error) {
 			logger.error('error in login AuthController method', error)
@@ -83,7 +83,7 @@ export default class AuthController extends ApiResponse implements IAuthControll
 
 	async register(req: Request, res: Response): Promise<void> {
 		try {
-			const user = await this.authService.userSignup(req.body)
+			const user = await this.authService.userSignup(req.body, res)
 			return this.sendSuccess(req, res, 'user registered in successfully', user)
 		} catch (error) {
 			logger.error('error in register AuthController method', error)

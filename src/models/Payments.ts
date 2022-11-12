@@ -3,9 +3,8 @@ import { model, Schema, Types } from 'mongoose'
 import IPayment from '@/interfaces/IPayment'
 
 const PaymentSchema: Schema = new Schema<IPayment>({
-	stripeTransactionId: {
+	stripeCheckoutSessionId: {
 		type: String,
-		required: true,
 	},
 	price: {
 		type: Number,
@@ -15,23 +14,60 @@ const PaymentSchema: Schema = new Schema<IPayment>({
 		type: Number,
 		required: true,
 	},
-	image: {
-		type: Types.ObjectId,
+	stripeFee: {
+		type: Number,
 		required: true,
-		ref: 'Image',
+	},
+	images: {
+		type: [{
+			type: Types.ObjectId,
+			required: true,
+			ref: 'Image',
+		}],
+		required: true,
 	},
 	buyer: {
 		type: Types.ObjectId,
 		required: true,
 		ref: 'User',
 	},
-	seller: {
+	failedTransfers: [{
 		type: Types.ObjectId,
-		required: true,
 		ref: 'User',
+	}],
+	transfers: {
+		type: [{
+			user: {
+				type: Types.ObjectId,
+				required: true,
+				ref: 'User',
+			},
+			amount: {
+				type: Number,
+				required: true,
+			},
+		}],
+		required: true,
+	},
+	transfer_group: {
+		type: String,
+		required: true,
+	},
+	paymentCompleted: {
+		type: Boolean,
+		default: false,
+	},
+	transferCompleted: {
+		type: Boolean,
+		default: false,
 	},
 }, {
 	timestamps: true,
+})
+
+PaymentSchema.index({
+	transfer_group: 'text',
+	stripeCheckoutSessionId: 'text',
 })
 
 export default model<IPayment>('Payment', PaymentSchema)

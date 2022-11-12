@@ -14,6 +14,7 @@ interface IAppConfig {
 	SES_USER: string
 	SES_PASS: string
 	STRIPE_SECRET_KEY: string
+	STRIPE_CHECKOUT_WEBHOOK_ENDPOINT_SECRET: string
 	[key: string]: string
 }
 
@@ -51,6 +52,9 @@ const AppConfig = (): IAppConfig => {
 	if (!process.env.STRIPE_SECRET_KEY) {
 		throw new Error('STRIPE_SECRET_KEY is required')
 	}
+	if (!process.env.STRIPE_CHECKOUT_WEBHOOK_ENDPOINT_SECRET) {
+		throw new Error('STRIPE_CHECKOUT_WEBHOOK_ENDPOINT_SECRET is required')
+	}
 
 	return {
 		PORT: process.env.PORT,
@@ -64,6 +68,7 @@ const AppConfig = (): IAppConfig => {
 		SES_USER: process.env.SES_USER,
 		SES_PASS: process.env.SES_PASS,
 		STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
+		STRIPE_CHECKOUT_WEBHOOK_ENDPOINT_SECRET: process.env.STRIPE_CHECKOUT_WEBHOOK_ENDPOINT_SECRET,
 	}
 }
 

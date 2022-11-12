@@ -16,6 +16,7 @@ export interface IUserController {
 	completePayoutAccount(req: Request, res: Response): Promise<void>
 	verifyPayoutAccount(req: Request, res: Response): Promise<void>
 	withdraw(req: Request, res: Response): Promise<void>
+	resendVerification(req: Request, res: Response): Promise<void>
 }
 
 export default class UserController extends ApiResponse implements IUserController {
@@ -30,7 +31,8 @@ export default class UserController extends ApiResponse implements IUserControll
 
 		this.router.get('/payout-account-link', AuthController.UserAuthMiddleware(), this.completePayoutAccount)
 		this.router.get('/payout-account-verify', AuthController.UserAuthMiddleware(), this.verifyPayoutAccount)
-		this.router.get('/withdraw', AuthController.UserAuthMiddleware(), this.withdraw)
+		this.router.post('/withdraw', AuthController.UserAuthMiddleware(), this.withdraw)
+		this.router.get('/resend-verification', AuthController.UserAuthMiddleware(), this.resendVerification)
 		this.router.get('/:userId', this.userDetails)
 	}
 
@@ -69,6 +71,16 @@ export default class UserController extends ApiResponse implements IUserControll
 			return this.sendSuccess(req, res, 'withdraw done')
 		} catch (error) {
 			logger.error('error in login UserController method', error)
+			return this.sendCustomError(req, res, error as CustomError)
+		}
+	}
+
+	async resendVerification(req: Request, res: Response): Promise<void> {
+		try {
+			await this.userService.resendVerificationLink(res.locals.user)
+			return this.sendSuccess(req, res, 'verification link sent')
+		} catch (error) {
+			logger.error('error in resendVerification UserController method', error)
 			return this.sendCustomError(req, res, error as CustomError)
 		}
 	}

@@ -6,7 +6,6 @@ const imageDiff = async (img1: string, img2: string): Promise<number> => new Pro
 		.onComplete((result: { misMatchPercentage: string }) => {
 			resolve(Number(result.misMatchPercentage))
 		})
-		.onError(() => resolve(100))
 })
 
 export default imageDiff

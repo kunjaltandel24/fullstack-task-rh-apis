@@ -1,4 +1,5 @@
 import bcrypt from 'bcryptjs'
+import { Response } from 'express'
 import { body, ValidationChain } from 'express-validator'
 import { omit } from 'lodash'
 import { LeanDocument } from 'mongoose'
@@ -32,11 +33,11 @@ export interface IAuthService {
 	userSigninValidationChain: ValidationChain[]
 	userSignupValidationChain: ValidationChain[]
 
-	userSignin(bodyParams: IUserSigninParams): Promise<{
+	userSignin(bodyParams: IUserSigninParams, res: Response): Promise<{
 		token: string,
 		user: Omit<LeanDocument<IUser>, 'password'>
 	}>
-	userSignup(bodyParams: IUserSignupParams): Promise<{
+	userSignup(bodyParams: IUserSignupParams, res: Response): Promise<{
 		token: string,
 		user: Omit<LeanDocument<IUser>, 'password'>
 	}>
@@ -78,7 +79,7 @@ export default class AuthService implements IAuthService {
 		this.stripeService = new StripeService()
 	}
 
-	async userSignin(bodyParams: IUserSigninParams): Promise<{
+	async userSignin(bodyParams: IUserSigninParams, res: Response): Promise<{
 		token: string,
 		user: Omit<LeanDocument<IUser>, 'password'>
 	}> {
@@ -103,13 +104,15 @@ export default class AuthService implements IAuthService {
 
 		const token: string = signToken({ uid: user._id.toString() })
 
+		res.cookie('token', token)
+
 		return {
 			token,
 			user: omit(user.toJSON(), ['password']),
 		}
 	}
 
-	async userSignup(bodyParams: IUserSignupParams): Promise<{
+	async userSignup(bodyParams: IUserSignupParams, res: Response): Promise<{
 		token: string,
 		user: Omit<LeanDocument<IUser>, 'password'>
 	}> {
@@ -147,6 +150,8 @@ export default class AuthService implements IAuthService {
 			})
 
 		const token: string = signToken({ uid: user._id.toString() })
+
+		res.cookie('token', token)
 
 		return {
 			token,

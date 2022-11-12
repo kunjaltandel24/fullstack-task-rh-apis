@@ -21,6 +21,12 @@ export interface IImageController {
 	upload(req: Request, res: Response): Promise<void>
 	deleteImages(req: Request, res: Response): Promise<void>
 	changePermissionOfImages(req: Request, res: Response): Promise<void>
+	getAllTags(req: Request, res: Response): Promise<void>
+	imageDetails(req: Request, res: Response): Promise<void>
+	updateImagePrices(req: Request, res: Response): Promise<void>
+	verifyDiscount(req: Request, res: Response): Promise<void>
+	checkout(req: Request, res: Response): Promise<void>
+	checkoutWebHook(req: Request, res: Response): Promise<void>
 }
 
 const storage = multer.diskStorage({
@@ -92,7 +98,18 @@ export default class ImageController extends ApiResponse implements IImageContro
 			this.imageService.uploadImageValidation,
 			this.upload,
 		)
+		this.router.get(
+			'/tags',
+			this.getAllTags,
+		)
 		this.router.get('/:userId', AuthController.UserAuthMiddleware(true), this.userImages)
+		this.router.get('/details/:imageId', AuthController.UserAuthMiddleware(true), this.imageDetails)
+		this.router.post(
+			'/update-prices',
+			AuthController.UserAuthMiddleware(),
+			this.imageService.listForSellValidationChain,
+			this.updateImagePrices,
+		)
 		this.router.post(
 			'/delete',
 			AuthController.UserAuthMiddleware(),
@@ -103,7 +120,22 @@ export default class ImageController extends ApiResponse implements IImageContro
 			'/change-permission',
 			AuthController.UserAuthMiddleware(),
 			this.imageService.changePermissionValidationChain,
-			this.deleteImages,
+			this.changePermissionOfImages,
+		)
+		this.router.post(
+			'/verify-discount-code',
+			AuthController.UserAuthMiddleware(),
+			this.verifyDiscount,
+		)
+		this.router.post(
+			'/checkout',
+			AuthController.UserAuthMiddleware(),
+			this.imageService.checkoutValidationChain,
+			this.checkout,
+		)
+		this.router.post(
+			'/checkout/webhook',
+			this.checkoutWebHook,
 		)
 	}
 
@@ -119,7 +151,7 @@ export default class ImageController extends ApiResponse implements IImageContro
 
 	async userImages(req: Request, res: Response): Promise<void> {
 		try {
-			const result = await this.imageService.userImages(req.query, req.params.userId, res.locals.user)
+			const result = await this.imageService.userImages(req.query, req.params.userId, undefined, res.locals.user)
 			return this.sendSuccess(req, res, 'user images', result)
 		} catch (error) {
 			logger.error('error in register ImageController method', error)
@@ -153,6 +185,66 @@ export default class ImageController extends ApiResponse implements IImageContro
 			return this.sendSuccess(req, res, 'user images deleted successfully')
 		} catch (error) {
 			logger.error('error in register ImageController method', error)
+			return this.sendCustomError(req, res, error as CustomError)
+		}
+	}
+
+	async getAllTags(req: Request, res: Response): Promise<void> {
+		try {
+			const result = await this.imageService.allTags(req.query)
+			return this.sendSuccess(req, res, 'existing tags', result)
+		} catch (error) {
+			logger.error('error in register ImageController method', error)
+			return this.sendCustomError(req, res, error as CustomError)
+		}
+	}
+
+	async imageDetails(req: Request, res: Response): Promise<void> {
+		try {
+			const result = await this.imageService.imageDetails(req.params.imageId, res.locals.user)
+			return this.sendSuccess(req, res, 'image details', result)
+		} catch (error) {
+			logger.error('error in imageDetails ImageController method', error)
+			return this.sendCustomError(req, res, error as CustomError)
+		}
+	}
+
+	async updateImagePrices(req: Request, res: Response): Promise<void> {
+		try {
+			const result = await this.imageService.updateImagePrices(req.body, res.locals.user)
+			return this.sendSuccess(req, res, 'image prices updated', result)
+		} catch (error) {
+			logger.error('error in updateImagePrices ImageController method', error)
+			return this.sendCustomError(req, res, error as CustomError)
+		}
+	}
+
+	async verifyDiscount(req: Request, res: Response): Promise<void> {
+		try {
+			const result = await this.imageService.verifyDiscountCode(req.body)
+			return this.sendSuccess(req, res, 'discount coupon', result)
+		} catch (error) {
+			logger.error('error in updateImagePrices ImageController method', error)
+			return this.sendCustomError(req, res, error as CustomError)
+		}
+	}
+
+	async checkout(req: Request, res: Response): Promise<void> {
+		try {
+			const result = await this.imageService.checkoutSession(req.body, res.locals.user)
+			return this.sendSuccess(req, res, 'discount coupon', result)
+		} catch (error) {
+			logger.error('error in checkout ImageController method', error)
+			return this.sendCustomError(req, res, error as CustomError)
+		}
+	}
+
+	async checkoutWebHook(req: Request, res: Response): Promise<void> {
+		try {
+			await this.imageService.checkoutSessionCompletion(req.body, req.headers['stripe-signature'] as string)
+			return this.sendSuccess(req, res, 'checkout complete')
+		} catch (error) {
+			logger.error('error in checkout ImageController method', error)
 			return this.sendCustomError(req, res, error as CustomError)
 		}
 	}

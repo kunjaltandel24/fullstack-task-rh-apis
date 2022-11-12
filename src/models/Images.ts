@@ -30,6 +30,12 @@ const ImageSchema: Schema = new Schema<IImage>({
 		type: [String],
 		default: [],
 	},
+	stripePriceId: String,
+	stripeProductId: String,
+	isDeleted: {
+		type: Boolean,
+		default: false,
+	},
 }, {
 	timestamps: true,
 	toObject: { getters: true },
