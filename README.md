@@ -1,6 +1,5 @@
-# TDL Image Server
+# Image Gallery Backend
 
-## Build Setup
 - Clone Both [image-gallery-client](https://github.com/kunjaltandel24/image-gallery-client) and [image-gallery](https://github.com/kunjaltandel24/image-gallery) in single folder and Follow the steps mentioned below.
 
 ## required services
@@ -14,12 +13,16 @@
   - **SES_EMAIL** any email enable in your enabled in your Mail Server of SMTP host.
   - if aws then required **access_key** as user and **secret_access_key** as password to SMTP service
 
+## Build Setup
 ```bash
 # add env
 $ cp sample.env .env // fill all variables with approprite values[dont use sample config values in production]
 
 # install dependencies
 $ npm install
+
+# build
+$ npm run build
 
 # starts node process
 $ npm start
